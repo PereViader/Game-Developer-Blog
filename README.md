@@ -6,4 +6,4 @@
 
 # Url
 
-https://pereviader.github.io/Personal-Webiste/
+https://pereviader.github.io/Game-Developer-Blog/
