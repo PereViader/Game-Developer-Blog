@@ -1,0 +1,5 @@
+#ignore the _site folder, this is generated locally for testing purposes
+_site
+
+#cache files should be generated locally on every machine
+.sass-cache
