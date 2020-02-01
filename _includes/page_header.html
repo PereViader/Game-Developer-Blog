@@ -3,13 +3,24 @@
 	<h2>{{ site.texture.tagline }}</h2>
 	<ul class="social">
 		{%- if site.texture.social_links.github -%}
-			<a href="https://github.com/{{ site.texture.social_links.github }}"><li><i class="icon-github-circled"></i></li></a>
+		<a href="https://github.com/{{ site.texture.social_links.github }}">
+			<li><i class="fab fa-github social-icon"></i></li>
+		</a>
 		{%- endif -%}
 		{%- if site.texture.social_links.linkedIn -%}
-			<a href="https://linkedin.com/{{ site.texture.social_links.linkedIn }}"><li><i class="icon-linkedin-squared"></i></li></a>
+		<a href="https://linkedin.com/{{ site.texture.social_links.linkedIn }}">
+			<li><i class="fab fa-linkedin social-icon"></i></i></li>
+		</a>
 		{%- endif -%}
 		{%- if site.texture.social_links.twitter -%}
-			<a href="https://twitter.com/{{ site.texture.social_links.twitter }}"><li><i class="icon-twitter-squared"></i></li></a>
+		<a href="https://twitter.com/{{ site.texture.social_links.twitter }}">
+			<li><i class="fab fa-twitter-square social-icon"></i></li>
+		</a>
+		{%- endif -%}
+		{%- if site.texture.social_links.rss -%}
+		<a href="/{{ site.texture.social_links.rss }}">
+			<li><i class="fas fa-rss-square social-icon"></i></li>
+		</a>
 		{%- endif -%}
 	</ul>
 </div>

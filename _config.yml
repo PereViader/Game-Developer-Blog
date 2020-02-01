@@ -30,7 +30,7 @@ texture:
     #twitter: ...
     github:  PereViader
     linkedIn: in/pere-viader-masuet
-    #rss: ...
+    rss: feed.xml
  
 
 # If you want to link only specific pages in your header, uncomment
