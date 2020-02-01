@@ -28,7 +28,7 @@ texture:
 
   # generate social links in footer
   social_links:
-    #twitter: ...
+    twitter: truci4
     github:  PereViader
     linkedIn: in/pere-viader-masuet
     rss: feed.xml
