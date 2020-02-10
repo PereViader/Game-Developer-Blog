@@ -48,3 +48,5 @@ plugins:
 
 exclude:
   - excluded 
+
+google_analytics: UA-158047735-1
