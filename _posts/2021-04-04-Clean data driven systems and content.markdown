@@ -233,5 +233,5 @@ On this piece of code we can observe:
 **Multiple dynamic** should be used when there are multiple strategies and they should all be runnable from the same place.
 
 Further notes and recommendations:
-- **Single** and **Multiple static** are the same implementation wise, but a design decision has been made when selecting **Multiple single** over **Multiple dynamic**. 
+- **Single** and **Multiple static** are the same implementation wise, but a design decision has been made when selecting **Multiple static** over **Multiple dynamic**. 
 - If you find yourself implementing some data driven functionality and currently have a single strategy to implement, implementing it using **Single** and when the requirements change the functionality can be easily refactored to **Multiple dynamic**.
