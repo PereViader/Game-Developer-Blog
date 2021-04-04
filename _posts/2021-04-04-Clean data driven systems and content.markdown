@@ -16,7 +16,7 @@ For the interests of this post, we are going to generalize and say a game is a p
 
 # Use Cases
 
-Lets tackle the same use case of a system and its data, working together to create an experience, growing in complexity one at a time.
+Let's tackle the same use case of a system and its data, working together to create an experience, growing in complexity one at a time.
 
 
 ## Single
@@ -232,6 +232,6 @@ On this piece of code we can observe:
 
 **Multiple dynamic** should be used when there are multiple strategies and they should all be runnable from the same place.
 
-Further notes and recomendations:
-- **Single** and **Multiple static** are the same implementation wise, but a design desision has been made when selecting **Multiple single** over **Multiple dynamic**. 
+Further notes and recommendations:
+- **Single** and **Multiple static** are the same implementation wise, but a design decision has been made when selecting **Multiple single** over **Multiple dynamic**. 
 - If you find yourself implementing some data driven functionality and currently have a single strategy to implement, implementing it using **Single** and when the requirements change the functionality can be easily refactored to **Multiple dynamic**.
