@@ -83,7 +83,7 @@ public class TargetAtDistanceLocomotionSystemData
 }
 
 
-public WaypointLocomotionSystem
+public class WaypointLocomotionSystem
 {
     private WaypointLocomotionSystemData waypointData;
 
@@ -98,7 +98,7 @@ public WaypointLocomotionSystem
     }
 }
 
-public TargetAtDistanceLocomotionSystem
+public class TargetAtDistanceLocomotionSystem
 {
     private TargetAtDistanceLocomotionSystemData targetAtDistanceData;
 
@@ -118,7 +118,6 @@ On this piece of code we can observe:
 - There is a data class for each movement strategy
 - There is a system class for each movement strategy
 - Each system strategy has access to the corresponding data
-- When the class is move is requested the actual strategy class is built
 
 
 ## Multiple dinamic
@@ -149,12 +148,12 @@ public class TargetAtDistanceLocomotionSystemData : ILocomotionSystemData
 }
 
 
-public ILocomotionSystemBehaviour
+public interface ILocomotionSystemBehaviour
 {
     void Tick();
 }
 
-public WaypointLocomotionSystemBehaviour : ILocomotionSystemBehaviour
+public class WaypointLocomotionSystemBehaviour : ILocomotionSystemBehaviour
 {
     private readonly WaypointLocomotionSystemData waypointData;
 
@@ -169,7 +168,7 @@ public WaypointLocomotionSystemBehaviour : ILocomotionSystemBehaviour
     }
 }
 
-public TargetAtDistanceLocomotionSystemBehaviour : ILocomotionSystemBehaviour
+public class TargetAtDistanceLocomotionSystemBehaviour : ILocomotionSystemBehaviour
 {
     private readonly TargetAtDistanceLocomotionSystemData targetAtDistanceData;
 
@@ -218,7 +217,7 @@ On this piece of code we can observe:
 - There is an empty interface for the data classes
 - There is a data class for each movement strategy
 - There is an interface for the system movement behaviour
-- There is a moment class for each movement strategy
+- There is a class for each movement strategy
 - Each movement strategy has access to the corresponding data
 - There is a class that implements the system
 - When the system is requested to Move the concrete strategy is selected and used
