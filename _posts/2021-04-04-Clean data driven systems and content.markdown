@@ -226,7 +226,9 @@ On this piece of code we can observe:
 # Conclusions 
 
 **Single** should be used when a single strategy is needed.
+
 **Multiple static** should be used when there are multiple strategies and it is selected when first creating it.
+
 **Multiple dynamic** should be used when there are multiple strategies and they should all be runnable from the same place.
 
 Further notes and recomendations:
