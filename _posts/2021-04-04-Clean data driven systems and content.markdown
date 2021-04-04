@@ -8,7 +8,8 @@ The following things must be taken into account when reading the post:
 - The examples are in [C#](https://en.wikipedia.org/wiki/C_Sharp_(programming_language)) but won't have any [game engine](https://en.wikipedia.org/wiki/Game_engine) specific code
 - The examples will be centered around the data and how the systems ingest. Actual system implementation is omitted or simplified to ease the reading.
 - [Strategy pattern is known](https://en.wikipedia.org/wiki/Strategy_pattern)
-- [Further clean code cleaning refactorings and other techniques could be applied to the examples](http://principles-wiki.net/resources:clean_code)
+- [The concept of refactoring is known](https://en.wikipedia.org/wiki/Code_refactoring)
+- [Further clean code cleaning and other techniques could be applied to the examples](http://principles-wiki.net/resources:clean_code)
 
 For the interests of this post, we are going to generalize and say a game is a piece of software that can be split in two parts: systems and data (content). The systems are pieces of software that given some data will behave in some way or another. For example, a text dialogue system might be given a piece of text it needs to play or an NPC might be given an AI behaviour to execute. Whatever the complexity and concrete use case details these two parts work together to provide the experience desired to the player.
 
@@ -232,5 +233,5 @@ On this piece of code we can observe:
 **Multiple dynamic** should be used when there are multiple strategies and they should all be runnable from the same place.
 
 Further notes and recomendations:
-- Single and multiple static are the same implementation wise, but a design desision has been made when selecting multiple single over multiple dynamic. 
-- If you find yourself implementing some data drive functionality and currently have a single strategy to implement, implementing it using **Single** and when the requirements change the functionality can be easily refactored to **Multiple dynamic**.
+- **Single** and **Multiple static** are the same implementation wise, but a design desision has been made when selecting **Multiple single** over **Multiple dynamic**. 
+- If you find yourself implementing some data driven functionality and currently have a single strategy to implement, implementing it using **Single** and when the requirements change the functionality can be easily refactored to **Multiple dynamic**.
