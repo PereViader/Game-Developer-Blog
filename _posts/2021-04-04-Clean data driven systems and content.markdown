@@ -132,7 +132,7 @@ A single system can run all the strategies. In order to do all of them it uses t
 
 
 ```
-public class ILocomotionSystemData
+public interface ILocomotionSystemData
 {
 }
 
