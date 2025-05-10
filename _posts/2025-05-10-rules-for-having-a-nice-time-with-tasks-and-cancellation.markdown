@@ -1,8 +1,23 @@
-# Rules for having a nice time with Tasks and Cancellation in Unity3d
+---
+layout: post
+title: "Rules for having a nice time with Tasks and Cancellation in Unity3d"
+date: 2025-05-10 00:00:00 +1
+---
 
-- The only `async void` that should be present in the codebase should be `RunAsync`
+Working with async and CancellationToken in Unity3d can feel like juggling knives—one wrong move and something crashes silently or never cancels when it should. After running into enough edge cases, crashes, and confusing bugs, I’ve settled on a set of simple, consistent rules that help keep async code predictable, debuggable, and safe. These are the conventions I follow in all my Unity3d projects. Hope they help you too.
+
+
+### 1. There should be a single `async void` method in the codebase
+
+Async void is the place where all async flows must start in order for them to be captured. When a root `async Task` or `Task` method and is called but not awaited and an exception happens inside it, the exception will be captured by that root Task and silently hidden. This avoids a potential application crash but at the same time hides information from the developer that something went wrong.
+
+Implementing some methods with `async void` and other with `Task` or `async Task` also means that not all methods can be composed and that we need to manually update them when the need araises.
+
+Thus implementing all methods with `Task` and then using a single `async void` method is the best way to make sure we get all the information and at the same.
+
+I like to call this method `RunAsync`. The name also helps make it clear that the method is a branching async Task flow that is starting.
+
 Exception: Event callbacks that need to trigger async flows can break this rule, otherwise they can't actually be called
-Justification: Async void is the place where all async flows must start in order for them to be captured. Implementing some methods with `async void` and other with `Task` or `async Task` means that not all methods can be composed and that we need to manually update them when the need araises.
 
 ```csharp
 public static async void RunAsync(this Task task)
@@ -16,17 +31,10 @@ public static async void RunAsync(this Task task)
         //Supressed
     }
 }
-```
 
-
-- In unity3d, at the root of execution of a Task method you should always call the `RunAsync` extension method
-Justification: When a Task method is not awaited at the root level and the Task fails, the exception will not be captured and surfaced thus it is silently ignored. This happens because on each level of the Task awaiting state machine, the next task in the chain is the one that captures and forwards the exception to the next one by awaiting it there. Only Tasks awaited on `async void`  methods will actually capture and surface the surface the exception. When a Task method is run, the exception will end up captured within the last Task in the chain and then silently ignored and discarded.
-RunAsync also helps make it clear that the method is a branching async Task flow that is starting.
-
-```csharp
 public void MethodSync()
 {
-    //This clearly shows that an async flow is started 
+    //This clearly shows that an async flow is starting
     MethodAsync(CancellationToken.None).RunAsync();
 }
 
@@ -34,20 +42,38 @@ public async Task MethodAsync(CancellationToken ct) { ... }
 ```
 
 
-- All async methods should receive a CancellationToken as the last paramter
-Justification: When all methods implement cancellation properly, implementation complexity is nil. Providing cancellation everywhere as parameter means that we can implement any cancellation strategy at any of the layers.
+### 2. All async methods should receive a CancellationToken as the last parameter
+When all methods implement cancellation properly, implementation complexity is nil. Providing cancellation everywhere as parameter means that we can implement any cancellation strategy at any of the layers.
 
 ```csharp
 public async Task Method1Async(CancellationToken ct) { ... }
 public Task Method3Async(Guid id, float time, CancellationToken ct) { ... }
 ```
 
-- When an async Method is cancelled it should fail with an OperationCancelledException
-Remarks: This is the task that is thrown when `CancellationToken.ThrowIfCancellationRequested` or `TaskCompletionSource.SetCancelled` is called
-Justification: This is the preferred C# convention and the way all of the System and third party libraries work. Embracing this reduces complexity and friction.
+
+### 3. Forward CancellationToken and avoid interaction with it
+
+We can differentiate between (non leaf) methods that forward a cancellation token and those (leaf) that where waiting actually occurs and
+
+```csharp
+public async Task NonLeafMethod(CancellationToken ct)
+{
+    //Notice that the CancellationToken is only forwarded to the next method
+    //Task.Delay will use the CancellationToken internally accordingly
+    await Task.Delay(1000, ct); 
+}
+```
 
 
-- Cancellable async methods should take advantadge of C# OperationCancelledException and assume they are never started cancelled
+### 4. Stay clear of cancellation bolierplate
+
+By embracing these two rules all cancellation boilerplate can be eliminated 
+1. Cancellable Task methods should assume they are never started cancelled
+2. Tasks should fail with `OperationCancelledException` when cancelled. 
+
+For rule 1, by embracing the assumption, you can be freed of the need to check the status of the CancellationToken on all methods in the codebase. You will only need to make sure that async flows are never started with a token that is already cancelled. This is much easier and a good practice in any case.
+
+For rule 2, `OperationCancelledException` comes from `CancellationToken.ThrowIfCancellationRequested` or `TaskCompletionSource.SetCancelled`. This is the preferred C# convention and the way all of the System and third party libraries work. Following the same pattern the language and third parties work will ease integration and avoids complexity.
 
 ```csharp
 public async Task SomeAsyncMethod(CancellationToken ct)
@@ -67,39 +93,13 @@ public async Task SomeAsyncMethod(CancellationToken ct)
 ```
 
 
-- Cancellation token should only be interacted with by methods that need to actively implement some waiting
-Justification: Leaf awaiting methods are the places where awaiting actually happens, those are the only places where the CancellationToken should be used, everywhere in the async chain should just forward the cancellation token
-Example:
+### 5. Prefer wrapping callback based APIs into async ones using TaskCompletionSource
 
-```csharp
-public async Task NonLeafMethod(CancellationToken ct)
-{
-    //Notice that the CancellationToken is only forwarded to the next method
-    await LeafTaskCompeletionSourceMethod(ct); 
-}
+TaskCompletionSource offers the perfect tools to turn any callback based API as tasks. 
 
-public async Task LeafTaskCompeletionSourceMethod(CancellationToken ct)
-{
-    var tcs = new TaskCompletionSource();
-    //Notice that we interact with the Cancellation token here
-    using var _ = ct.Register(() => tcs.SetCancelled());
+Make sure however to have TaskCompletionSource be an implementation. Exposing the TaskCompletionSource, is usually a source of unnecesary complexity.
 
-    DoSomeWorkThenRunCallback(() => {
-        if(ct.IsCancellationRequested)
-        {
-            return;
-        }
-
-        tcs.SetResult();
-    }
-
-    await tcs.Task; 
-}
-```
-
-- Encapsulate usages of TaskCompletionSource and expose them as Task
-Justification: The usage of TaskCompletionSource should always be an implementation detail to aid transforming some callback based code into async Task based. Exposing the TaskCompletionSource, is usually a source of unnecesary complexity.
-Exception: This rule may be broken when there are performance gains that warrant the extra complexity
+Notice that when using the `CancellationToken.Register` call, we also dispose of the `CancellationTokenRegistration` returned, otherwise we could be leaking resource for long living CancellationTokens
 
 ```csharp
 //Notice that the consumer of the method needn't know about the TaskCompletionSource within
@@ -121,32 +121,11 @@ public async Task DoSomeWorkAsync(CancellationToken ct)
 }
 ```
 
-- Prefer wrapping callback based APIs into async ones using TaskCompletionSource
-Justification: Legacy callback based APIs if used direclty introduce complexity that is usually better hidden in reusuable wrapping methods 
 
-```csharp
-//Notice that the responsability of this method is just to wrap the other
-public async Task DoSomeWorkAsync(CancellationToken ct)
-{
-    var tcs = new TaskCompletionSource();
-    using var _ = ct.Register(() => tcs.SetCancelled());
+### 6. When an async Method is cancelled it should finish execution instantly
 
-    DoSomeWorkCallback(() => {
-        if(ct.IsCancellationRequested)
-        {
-            return;
-        }
-
-        tcs.SetResult();
-    }
-
-    await tcs.Task; 
-}
-```
-
-
-- When an async Method is cancelled it should finish execution instantly
 Exception: This rule can be broken when the cancellation process is asyncrhonous. This should be the exception rather than the rule.
+
 For example, the following snippet does not properly cancel instantly given it waits for the callback to run before it either completes or cancels
 
 ```csharp
@@ -157,6 +136,8 @@ public Task MethodAsync(CancellationToken ct)
     SomeCallbackMethod(() => {
         if(ct.IsCancellationRequested)
         {
+            // Cancellation happens late, this callback may run at any point in the future
+            // After the cancellation was requested
             tcs.SetCancelled();
             return;
         }
@@ -169,12 +150,14 @@ public Task MethodAsync(CancellationToken ct)
 ```
 
 This should instead be implemented by Registering the TaskCompletionSource to be finished instantly when the CancellationToken is cancelled
+
 Notice that the callback will still run at a later time but it will detect it is cancelled and will early exit accordingly
 
 ```csharp
 public async Task MethodAsync(CancellationToken ct)
 {
     var tcs = new TaskCompletionSource();
+    //Cancellation happens instantly together with the CancellationToken
     using var _ = ct.Register(() => tcs.SetCancelled());
 
     SomeCallbackMethod(() => {
