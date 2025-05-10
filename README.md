@@ -6,4 +6,4 @@
 
 # Url
 
-https://pereviader.github.io/Game-Developer-Blog/
+https://pere.viader.cat/

@@ -53,7 +53,7 @@
 {%- endif -%}
 // Textures
 .texture-black {
-    background-image: url('{{ site.baseurl }}/assets/textures/black.jpg');
+    background-image: url('/assets/textures/black.jpg');
 
     h2 {
         color: #999;
@@ -61,7 +61,7 @@
 }
 
 .texture-blue {
-    background-image: url('{{ site.baseurl }}/assets/textures/blue.jpg');
+    background-image: url('/assets/textures/blue.jpg');
 
     h2 {
         color: #ddd;
@@ -77,15 +77,15 @@
 }
 
 .texture-red {
-    background-image: url('{{ site.baseurl }}/assets/textures/red.jpg');
+    background-image: url('/assets/textures/red.jpg');
 }
 
 .texture-purple {
-    background-image: url('{{ site.baseurl }}/assets/textures/purple.jpg');
+    background-image: url('/assets/textures/purple.jpg');
 }
 
 .texture-green {
-    background-image: url('{{ site.baseurl }}/assets/textures/green.jpg');
+    background-image: url('/assets/textures/green.jpg');
 
     .post-date {
         color: #ccc;
